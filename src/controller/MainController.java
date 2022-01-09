@@ -1,5 +1,7 @@
 package controller;
 
+import repository.Forest;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -23,7 +25,7 @@ public class MainController {
 
     public static ResourceBundle stringResources;
 
-//    private static Forest forest;
+    private static Forest forest;
 
     public static void startApp() throws FileNotFoundException {
         try(FileInputStream fis = new FileInputStream(CONFIGS_FILE)) {
@@ -56,32 +58,32 @@ public class MainController {
                 new Locale(properties.getProperty("LOCALE"))
         );
 
-//        switch (iniType) {
-//            case EMPTY_INIT_MODE:
-//                Forest.emptyInit();
-//                break;
-//            case DEFAULT_INIT_MODE:
-//                Forest.defaultInit();
-//                break;
-//            case FILE_INIT_MODE:
-//                try {
-//                    Forest.load(repositoryFile);
-//                } catch (IOException | ClassNotFoundException e) {
-//                    if (e instanceof FileNotFoundException) {
-//                        System.out.println(stringResources.getString("FILE_NOT_FOUND"));
-//                        Forest.defaultInit();
-//                    } else {
-//                        System.out.println(e.getMessage());
-//                    }
-//                }
-//                break;
-//        }
-//
-//        forest = Forest.getInstance();
+        switch (iniType) {
+            case EMPTY_INIT_MODE:
+                Forest.emptyInit();
+                break;
+            case DEFAULT_INIT_MODE:
+                Forest.defaultInit();
+                break;
+            case FILE_INIT_MODE:
+                try {
+                    Forest.load(repositoryFile);
+                } catch (IOException | ClassNotFoundException e) {
+                    if (e instanceof FileNotFoundException) {
+                        System.out.println(stringResources.getString("FILE_NOT_FOUND"));
+                        Forest.defaultInit();
+                    } else {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                break;
+        }
+
+        forest = Forest.getInstance();
     }
 
     public static void closeApp() throws IOException {
-//        Forest.save(MainController.repositoryFile);
+        Forest.save(MainController.repositoryFile);
         System.exit(0);
     }
 
