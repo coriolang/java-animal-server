@@ -1,9 +1,13 @@
 package controller.listeners;
 
+import controller.MainController;
 import view.ServerFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class StartServerButtonListener implements ActionListener {
 
@@ -15,6 +19,11 @@ public class StartServerButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        frame.getLogsTextArea().setText("SERVER STARTED!!");
+        MainController.startServer();
+
+        frame.getLogsTextArea().setText(
+                LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"))
+                        + " The server is running"
+        );
     }
 }

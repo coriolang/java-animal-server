@@ -1,9 +1,13 @@
 package controller.listeners;
 
+import controller.MainController;
 import view.ServerFrame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class StopServerButtonListener implements ActionListener {
 
@@ -15,6 +19,16 @@ public class StopServerButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        frame.getLogsTextArea().setText("SERVER STOPPED!!");
+        try {
+            MainController.stopServer();
+
+            frame.getLogsTextArea().append(
+                    "\n"
+                            + LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"))
+                            + " The server stopped"
+            );
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

@@ -2,7 +2,7 @@ package view;
 
 import controller.MainController;
 import controller.listeners.ApplyConfigButtonListener;
-import controller.listeners.CloseWindowListener;
+import controller.listeners.WindowListener;
 import controller.listeners.StartServerButtonListener;
 import controller.listeners.StopServerButtonListener;
 
@@ -42,7 +42,7 @@ public class ServerFrame extends Frame {
         setLocationRelativeTo(null);
         setBackground(Color.GREEN);
 
-        addWindowListener(new CloseWindowListener(this));
+        addWindowListener(new WindowListener(this));
 
         setLabels();
         setChoices();

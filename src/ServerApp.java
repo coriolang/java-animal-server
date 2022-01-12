@@ -3,9 +3,9 @@ import view.ServerFrame;
 
 import java.io.FileNotFoundException;
 
-public class Server {
+public class ServerApp {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         try {
             MainController.startApp();
         } catch (FileNotFoundException e) {
