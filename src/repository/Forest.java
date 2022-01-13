@@ -29,23 +29,23 @@ public class Forest implements Serializable {
         return forest;
     }
 
-    public void create(Grass grass) {
+    public synchronized void create(Grass grass) {
         idCounter++;
         grass.setId(idCounter);
         putGrass(grass);
     }
 
-    public void create(Animal animal) {
+    public synchronized void create(Animal animal) {
         idCounter++;
         animal.setId(idCounter);
         putAnimal(animal);
     }
 
-    private void putGrass(Grass grass) {
+    private synchronized void putGrass(Grass grass) {
         grasses.put(grass.getId(), grass);
     }
 
-    private void putAnimal(Animal animal) {
+    private synchronized void putAnimal(Animal animal) {
         if (animal instanceof Herbivore herbivore) {
             herbivores.put(herbivore.getId(), herbivore);
         } else {
@@ -54,7 +54,7 @@ public class Forest implements Serializable {
         }
     }
 
-    public void update(Grass grass) throws IllegalArgumentException {
+    public synchronized void update(Grass grass) throws IllegalArgumentException {
         if (!grasses.containsValue(grass)) {
             throw new IllegalArgumentException(MainController.stringResources.getString("GRASS_NOT_EXISTS"));
         }
@@ -62,7 +62,7 @@ public class Forest implements Serializable {
         grasses.replace(grass.getId(), grass);
     }
 
-    public void update(Animal animal) throws IllegalArgumentException {
+    public synchronized void update(Animal animal) throws IllegalArgumentException {
         if (animal instanceof Herbivore herbivore) {
             if (!herbivores.containsValue(herbivore)) {
                 throw new IllegalArgumentException(MainController.stringResources.getString("HERB_NOT_EXISTS"));
@@ -80,7 +80,7 @@ public class Forest implements Serializable {
         }
     }
 
-    public Animal findAnimalById(int id) {
+    public synchronized Animal findAnimalById(int id) {
         Animal animal = herbivores.get(id);
         if (animal != null)
             return animal;
@@ -92,15 +92,15 @@ public class Forest implements Serializable {
         return null; // Метод вернет значение null, если значения с переданным ключом нет
     }
 
-    public Grass findGrassById(int id) {
+    public synchronized Grass findGrassById(int id) {
         return grasses.get(id); // Метод вернет значение null, если значения с переданным ключом нет
     }
 
-    public HashMap<Integer, Grass> getAllGrasses() {
+    public synchronized HashMap<Integer, Grass> getAllGrasses() {
         return grasses;
     }
 
-    public HashMap<Integer, Animal> getAllAnimals() {
+    public synchronized HashMap<Integer, Animal> getAllAnimals() {
         HashMap<Integer, Animal> animals = new HashMap<>();
 
         animals.putAll(herbivores);
@@ -109,15 +109,15 @@ public class Forest implements Serializable {
         return animals;
     }
 
-    public HashMap<Integer, Predator> getAllPredators() {
+    public synchronized HashMap<Integer, Predator> getAllPredators() {
         return predators;
     }
 
-    public HashMap<Integer, Herbivore> getAllHerbivores() {
+    public synchronized HashMap<Integer, Herbivore> getAllHerbivores() {
         return herbivores;
     }
 
-    public HashMap<Integer, Animal> getAllLiveAnimals() {
+    public synchronized HashMap<Integer, Animal> getAllLiveAnimals() {
         HashMap<Integer, Animal> animals = new HashMap<>();
 
         for (Herbivore herbivore : herbivores.values()) {
@@ -134,7 +134,7 @@ public class Forest implements Serializable {
         return animals;
     }
 
-    public HashMap<Integer, Predator> getAllLivePredators() {
+    public synchronized HashMap<Integer, Predator> getAllLivePredators() {
         HashMap<Integer, Predator> livePredators = new HashMap<>();
 
         for (Predator predator : predators.values()) {
@@ -146,7 +146,7 @@ public class Forest implements Serializable {
         return livePredators;
     }
 
-    public HashMap<Integer, Herbivore> getAllLiveHerbivores() {
+    public synchronized HashMap<Integer, Herbivore> getAllLiveHerbivores() {
         HashMap<Integer, Herbivore> liveHerbivore = new HashMap<>();
 
         for (Herbivore herbivore : herbivores.values()) {
