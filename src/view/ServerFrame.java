@@ -15,7 +15,6 @@ public class ServerFrame extends Frame {
             ipAddressLabel,
             ipAddressTextLabel,
             portLabel,
-            portTextLabel,
             configLabel,
             languageLabel,
             initializationTypeLabel,
@@ -29,6 +28,9 @@ public class ServerFrame extends Frame {
     private Button applyConfigButton,
             startServerButton,
             stopServerButton;
+
+    // TextFields
+    private TextField portTextField;
 
     // TextArea
     private TextArea logsTextArea;
@@ -47,6 +49,7 @@ public class ServerFrame extends Frame {
         setLabels();
         setChoices();
         setButtons();
+        setTextFields();
         setTextAreas();
 
         setVisible(true);
@@ -60,7 +63,6 @@ public class ServerFrame extends Frame {
         ipAddressLabel = new Label(MainController.stringResources.getString("IP_ADDRESS_LABEL"));
         ipAddressTextLabel = new Label();
         portLabel = new Label(MainController.stringResources.getString("PORT_LABEL"));
-        portTextLabel = new Label();
         configLabel = new Label(MainController.stringResources.getString("CONFIG_LABEL"));
         languageLabel = new Label(MainController.stringResources.getString("LANGUAGE_LABEL"));
         initializationTypeLabel = new Label(MainController.stringResources.getString("INITIALIZATION_TYPE_LABEL"));
@@ -75,8 +77,6 @@ public class ServerFrame extends Frame {
         ipAddressTextLabel.setBackground(Color.LIGHT_GRAY);
         portLabel.setBounds(16, 126, 120, 24);
         portLabel.setBackground(Color.LIGHT_GRAY);
-        portTextLabel.setBounds(152, 126, 472, 24);
-        portTextLabel.setBackground(Color.LIGHT_GRAY);
         configLabel.setBounds(16, 206, 608, 24);
         configLabel.setFont(robotoBold);
         configLabel.setBackground(Color.LIGHT_GRAY);
@@ -92,7 +92,6 @@ public class ServerFrame extends Frame {
         add(ipAddressLabel);
         add(ipAddressTextLabel);
         add(portLabel);
-        add(portTextLabel);
         add(configLabel);
         add(languageLabel);
         add(initializationTypeLabel);
@@ -137,6 +136,13 @@ public class ServerFrame extends Frame {
         add(stopServerButton);
     }
 
+    private void setTextFields() {
+        // TextFields
+        portTextField = new TextField();
+        portTextField.setBounds(152, 126, 472, 24);
+        add(portTextField);
+    }
+
     private void setTextAreas() {
         // TextArea
         logsTextArea = new TextArea();
@@ -145,12 +151,34 @@ public class ServerFrame extends Frame {
         add(logsTextArea);
     }
 
-    public Label getIpAddressTextLabel() {
-        return ipAddressTextLabel;
+    public void updateStrings() {
+        // Labels
+        serverLabel.setText(MainController.stringResources.getString("SERVER_LABEL"));
+        ipAddressLabel.setText(MainController.stringResources.getString("IP_ADDRESS_LABEL"));
+        portLabel.setText(MainController.stringResources.getString("PORT_LABEL"));
+        configLabel.setText(MainController.stringResources.getString("CONFIG_LABEL"));
+        languageLabel.setText(MainController.stringResources.getString("LANGUAGE_LABEL"));
+        initializationTypeLabel.setText(MainController.stringResources.getString("INITIALIZATION_TYPE_LABEL"));
+        logsLabel.setText(MainController.stringResources.getString("LOGS_LABEL"));
+
+        // Choices
+        languageChoice.removeAll();
+        languageChoice.addItem(MainController.stringResources.getString("RUSSIAN_LANG_ITEM"));
+        languageChoice.addItem(MainController.stringResources.getString("ENGLISH_LANG_ITEM"));
+
+        initializationTypeChoice.removeAll();
+        initializationTypeChoice.addItem(MainController.stringResources.getString("EMPTY_INIT_ITEM"));
+        initializationTypeChoice.addItem(MainController.stringResources.getString("DEFAULT_INIT_ITEM"));
+        initializationTypeChoice.addItem(MainController.stringResources.getString("FROM_FILE_INIT_ITEM"));
+
+        // Buttons
+        applyConfigButton.setLabel(MainController.stringResources.getString("APPLY_BUTTON"));
+        startServerButton.setLabel(MainController.stringResources.getString("START_SERVER_BUTTON"));
+        stopServerButton.setLabel(MainController.stringResources.getString("STOP_SERVER_BUTTON"));
     }
 
-    public Label getPortTextLabel() {
-        return portTextLabel;
+    public Label getIpAddressTextLabel() {
+        return ipAddressTextLabel;
     }
 
     public Choice getLanguageChoice() {
@@ -171,6 +199,10 @@ public class ServerFrame extends Frame {
 
     public Button getStopServerButton() {
         return stopServerButton;
+    }
+
+    public TextField getPortTextField() {
+        return portTextField;
     }
 
     public TextArea getLogsTextArea() {

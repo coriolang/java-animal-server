@@ -1,6 +1,7 @@
 package controller.listeners;
 
 import controller.MainController;
+import view.MessageBox;
 import view.ServerFrame;
 
 import java.awt.event.ActionEvent;
@@ -25,10 +26,18 @@ public class StopServerButtonListener implements ActionListener {
             frame.getLogsTextArea().append(
                     "\n"
                             + LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"))
-                            + " The server stopped"
+                            + " "
+                            + MainController.stringResources.getString("SERVER_STOPPED")
             );
+
+            frame.getPortTextField().setEnabled(true);
+            frame.getStartServerButton().setEnabled(true);
+            frame.getStopServerButton().setEnabled(false);
+            frame.getLanguageChoice().setEnabled(true);
+            frame.getInitializationTypeChoice().setEnabled(true);
+            frame.getApplyConfigButton().setEnabled(true);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            MessageBox.showError(ex.getMessage());
         }
     }
 }

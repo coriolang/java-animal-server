@@ -1,62 +1,51 @@
 package controller;
 
-import java.io.BufferedReader;
+import view.MessageBox;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
 
 public class Server implements Runnable {
 
     private ServerSocket serverSocket;
+    private int port;
 
-    private ExecutorService executeIt = Executors.newFixedThreadPool(4); // Заменить на коллекцию потоков
+    private ArrayList<ClientDialog> clients = new ArrayList<>();
+
+    public Server(int port) {
+        this.port = port;
+    }
 
     @Override
     public void run() {
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))) { // For received console commands in server
-
-            serverSocket = new ServerSocket(MainController.SERVER_PORT);
-
-            System.out.println(serverSocket.getInetAddress().getHostName() + "/" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort());
-
-            System.out.println("Server socket created, command console reader for listen to server commands");
+        try {
+            serverSocket = new ServerSocket(port);
 
             while (!serverSocket.isClosed()) {
-                if (bufferedReader.ready()) { // Check console commands in server
-                    System.out.println("Main Server found any messages in channel, let's look at them.");
-
-                    String serverCommand = bufferedReader.readLine();
-
-                    if (serverCommand.equalsIgnoreCase("quit")) { // Close server when command is "quit"
-                        System.out.println("Main Server initiate exiting...");
-                        serverSocket.close();
-                        break;
-                    }
-                }
-
-                // Waiting for the client
                 Socket client = serverSocket.accept();
 
-                // New connection in a separate thread
-                executeIt.execute(new ClientDialog(client));
-                System.out.print("Connection accepted.");
+                ClientDialog clientDialog = new ClientDialog(client);
+                clients.add(clientDialog);
+                new Thread(clientDialog).start();
             }
 
             stop();
         }  catch (SocketException e) {
-//            System.out.println("Socket closed");
+//            MessageBox.showInfo(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace(); // MessageBox!!
+            MessageBox.showError(e.getMessage());
         }
     }
 
     public void stop() throws IOException {
-        executeIt.shutdown();
-
+        for (ClientDialog clientDialog : clients) {
+            if (!clientDialog.getClientSocket().isClosed()) {
+                clientDialog.getClientSocket().close();
+            }
+        }
         serverSocket.close();
     }
 

@@ -7,6 +7,7 @@ import model.Grass;
 import model.Herbivore;
 import model.Predator;
 import repository.Forest;
+import view.MessageBox;
 
 import java.io.*;
 import java.net.URL;
@@ -18,8 +19,6 @@ public class MainController {
     private static final String CONFIGS_FILE = FileSystems.getDefault()
             .getPath("src", "resources", "configs.properties").toString();
 
-    public static final int SERVER_PORT = 1356;
-
     private static Server server;
 
     private static Properties properties;
@@ -29,9 +28,9 @@ public class MainController {
     private static final int DEFAULT_INIT_MODE = 1;
     private static final int FILE_INIT_MODE = 2;
 
-    public static ResourceBundle stringResources;
-
     private static Forest forest;
+
+    public static ResourceBundle stringResources;
 
     public static void startApp() throws FileNotFoundException {
         try(FileInputStream fis = new FileInputStream(CONFIGS_FILE)) {
@@ -41,11 +40,16 @@ public class MainController {
             throw new FileNotFoundException();
         }
 
-        int iniType = Integer.parseInt(
-                properties.getProperty("INITIALIZATION_TYPE")
+        stringResources = ResourceBundle.getBundle(
+                "resources.strings",
+                new Locale(properties.getProperty("LOCALE"))
         );
 
         String currentOSName = System.getProperty("os.name");
+
+        int iniType = Integer.parseInt(
+                properties.getProperty("INITIALIZATION_TYPE")
+        );
 
         if (currentOSName.contains("Windows")) {
             repositoryFile = properties.getProperty("REPOSITORY_FILE_WINDOWS");
@@ -56,39 +60,12 @@ public class MainController {
         } else {
             repositoryFile = FileSystems.getDefault().getPath("forest.dat").toString();
             iniType = 1;
-            System.out.println("Operating system not defined. Default initialization.");
+            MessageBox.showInfo(stringResources.getString("OS_NOT_DEFINED"));
         }
 
-        stringResources = ResourceBundle.getBundle(
-                "resources.strings",
-                new Locale(properties.getProperty("LOCALE"))
-        );
-
-        switch (iniType) {
-            case EMPTY_INIT_MODE:
-                Forest.emptyInit();
-                break;
-            case DEFAULT_INIT_MODE:
-                Forest.defaultInit();
-                break;
-            case FILE_INIT_MODE:
-                try {
-                    Forest.load(repositoryFile);
-                } catch (IOException | ClassNotFoundException e) {
-                    if (e instanceof FileNotFoundException) {
-                        System.out.println(stringResources.getString("FILE_NOT_FOUND"));
-                        Forest.defaultInit();
-                    } else {
-                        System.out.println(e.getMessage());
-                    }
-                }
-                break;
-        }
+        initialization(iniType);
 
         forest = Forest.getInstance();
-
-        System.out.println(iniType);
-        System.out.println(repositoryFile);
     }
 
     public static void closeApp() throws IOException {
@@ -96,13 +73,11 @@ public class MainController {
         System.exit(0);
     }
 
-    public static void startServer() {
-        server = new Server();
+    public static void startServer(int port) {
+        server = new Server(port);
         Thread serverThread = new Thread(server);
 
         serverThread.start();
-
-        System.out.println("Server started!");
     }
 
     public static void stopServer() throws IOException {
@@ -124,29 +99,79 @@ public class MainController {
         }
     }
 
-    public static String applyConfig(int selectedLanguage) throws IOException {
-        String languageStatus = stringResources.getString("LANGUAGE_NOT_SELECTED");
-
+    public static String applyConfig(int selectedLanguage, int selectedIniType) throws IOException {
         if (selectedLanguage == 0) {
             properties.setProperty("LOCALE", "ru");
         } else if (selectedLanguage == 1) {
             properties.setProperty("LOCALE", "en");
         }
 
-        saveConfigs();
-
         stringResources = ResourceBundle.getBundle(
                 "resources.strings",
                 new Locale(properties.getProperty("LOCALE"))
         );
 
-        if (selectedLanguage == 0) {
-            languageStatus = stringResources.getString("SELECTED_RUSSIAN");
-        } else if (selectedLanguage == 1) {
-            languageStatus = stringResources.getString("SELECTED_ENGLISH");
+        String initStatus = "";
+        switch (selectedIniType) {
+            case 0:
+                properties.setProperty("INITIALIZATION_TYPE", "0");
+                initStatus = MainController.stringResources.getString("EMPTY_INIT_SELECTED");
+                break;
+            case 1:
+                properties.setProperty("INITIALIZATION_TYPE", "1");
+                initStatus = MainController.stringResources.getString("DEFAULT_INIT_SELECTED");
+                break;
+            case 2:
+                properties.setProperty("INITIALIZATION_TYPE", "2");
+                initStatus = MainController.stringResources.getString("FROM_FILE_INIT_SELECTED");
+                break;
         }
 
-        return languageStatus;
+        int iniType = Integer.parseInt(
+                properties.getProperty("INITIALIZATION_TYPE")
+        );
+
+        initialization(iniType);
+
+        forest = Forest.getInstance();
+
+        saveConfigs();
+
+        return initStatus;
+    }
+
+    private static void initialization(int iniType) {
+        switch (iniType) {
+            case EMPTY_INIT_MODE:
+                Forest.emptyInit();
+                break;
+            case DEFAULT_INIT_MODE:
+                Forest.defaultInit();
+                break;
+            case FILE_INIT_MODE:
+                try {
+                    Forest.load(repositoryFile);
+                } catch (IOException | ClassNotFoundException e) {
+                    if (e instanceof FileNotFoundException) {
+                        MessageBox.showInfo(stringResources.getString("FILE_NOT_FOUND"));
+                        Forest.defaultInit();
+                    } else {
+                        MessageBox.showError(e.getMessage());
+                    }
+                }
+                break;
+        }
+    }
+
+    public static int getIniType() {
+        return Integer.parseInt(properties.getProperty("INITIALIZATION_TYPE"));
+    }
+
+    public static ResourceBundle getResourceBundle(String locale) {
+        return ResourceBundle.getBundle(
+                "resources.strings",
+                new Locale(locale)
+        );
     }
 
     public static String getPublicIpAddress() throws IOException {
@@ -158,7 +183,11 @@ public class MainController {
         return publicIpAddress;
     }
 
-    public static String create(int type, String name, float weight) {
+    public static String getDefaultPort() {
+        return properties.getProperty("DEFAULT_PORT");
+    }
+
+    public static String create(int type, String name, float weight, String locale) {
         String result = "";
 
         try {
@@ -176,7 +205,7 @@ public class MainController {
                     forest.create(grass);
                     break;
             }
-            result = "Creation successful!!";
+            result = getResourceBundle(locale).getString("CREATION_SUCCESSFUL");
         } catch (IllegalWeightException e) {
             result = e.getMessage();
         }
@@ -184,7 +213,7 @@ public class MainController {
         return result;
     }
 
-    public static String kill(int animalId) {
+    public static String kill(int animalId, String locale) {
         String result = "";
 
         try {
@@ -192,7 +221,7 @@ public class MainController {
             animal.die();
             forest.update(animal);
 
-            result = "Murder successful...";
+            result = getResourceBundle(locale).getString("MURDER_SUCCESSFUL");
         } catch (IllegalDeathException | NullPointerException e) {
             result = e.getMessage();
         }
@@ -200,7 +229,7 @@ public class MainController {
         return result;
     }
 
-    public static String feed(int animalId, int foodId) {
+    public static String feed(int animalId, int foodId, String locale) {
         String result = "";
 
         try {
@@ -211,7 +240,7 @@ public class MainController {
                 forest.update(herbivore);
                 forest.update(grass);
 
-                result = "Feeding successful!!";
+                result = getResourceBundle(locale).getString("FEEDING_SUCCESSFUL");
             } else if (animal instanceof Predator predator){
                 Herbivore herbivore = (Herbivore) forest.findAnimalById(foodId);
                 predator.eat(herbivore);
@@ -219,9 +248,9 @@ public class MainController {
                 forest.update(herbivore);
 
                 if (!herbivore.isAlive()) {
-                    result = "Successful hunt.";
+                    result = getResourceBundle(locale).getString("HUNT_SUCCESSFUL");
                 } else {
-                    result = "Unsuccessful hunt!!";
+                    result = getResourceBundle(locale).getString("HUNT_UNSUCCESSFUL");
                 }
             }
         } catch (IllegalCarrionException

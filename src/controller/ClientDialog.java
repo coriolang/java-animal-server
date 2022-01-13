@@ -1,5 +1,7 @@
 package controller;
 
+import view.MessageBox;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -19,19 +21,25 @@ public class ClientDialog implements Runnable {
 
             String[] splittedCommand = clientCommand.split("&");
 
-            if (splittedCommand[0].contains("get")) {
-                sentJson(splittedCommand);
-            } else if (splittedCommand[0].contains("create")) {
-                create(splittedCommand);
-            } else if (splittedCommand[0].contains("feed")) {
-                feed(splittedCommand);
-            } else if (splittedCommand[0].contains("kill")) {
-                kill(splittedCommand);
-            } else if (splittedCommand[0].contains("test")) {
-                test();
+            switch (splittedCommand[0]) {
+                case "get":
+                    sentJson(splittedCommand);
+                    break;
+                case "create":
+                    create(splittedCommand);
+                    break;
+                case "feed":
+                    feed(splittedCommand);
+                    break;
+                case "kill":
+                    kill(splittedCommand);
+                    break;
+                case "test":
+                    test();
+                    break;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            MessageBox.showError(e.getMessage());
         }
     }
 
@@ -50,8 +58,9 @@ public class ClientDialog implements Runnable {
         int type = Integer.parseInt(splittedCommand[1]);
         String name = splittedCommand[2];
         float weight = Float.parseFloat(splittedCommand[3]);
+        String locale = splittedCommand[4];
 
-        String result = MainController.create(type, name, weight);
+        String result = MainController.create(type, name, weight, locale);
 
         dataOutputStream.writeUTF(result);
         dataOutputStream.flush();
@@ -63,8 +72,9 @@ public class ClientDialog implements Runnable {
         DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
 
         int animalId = Integer.parseInt(splittedCommand[1]);
+        String locale = splittedCommand[2];
 
-        String result = MainController.kill(animalId);
+        String result = MainController.kill(animalId, locale);
 
         dataOutputStream.writeUTF(result);
         dataOutputStream.flush();
@@ -77,8 +87,9 @@ public class ClientDialog implements Runnable {
 
         int animalId = Integer.parseInt(splittedCommand[1]);
         int foodId = Integer.parseInt(splittedCommand[2]);
+        String locale = splittedCommand[3];
 
-        String result = MainController.feed(animalId, foodId);
+        String result = MainController.feed(animalId, foodId, locale);
 
         dataOutputStream.writeUTF(result);
         dataOutputStream.flush();
@@ -92,25 +103,37 @@ public class ClientDialog implements Runnable {
 
         String json = "";
 
-        if (splittedCommand[1].contains("allAnimals")) {
-            json = MainController.jsonAllAnimals();
-        } else if (splittedCommand[1].contains("allHerbivores")) {
-            json = MainController.jsonAllHerbivores();
-        } else if (splittedCommand[1].contains("allPredators")) {
-            json = MainController.jsonAllPredators();
-        } else if (splittedCommand[1].contains("allGrasses")) {
-            json = MainController.jsonAllGrasses();
-        } else if (splittedCommand[1].contains("liveAnimals")) {
-            json = MainController.jsonAllLiveAnimals();
-        } else if (splittedCommand[1].contains("liveHerbivores")) {
-            json = MainController.jsonAllLiveHerbivores();
-        } else if (splittedCommand[1].contains("livePredators")) {
-            json = MainController.jsonAllLivePredators();
+        switch (splittedCommand[1]) {
+            case "allAnimals":
+                json = MainController.jsonAllAnimals();
+                break;
+            case "allHerbivores":
+                json = MainController.jsonAllHerbivores();
+                break;
+            case "allPredators":
+                json = MainController.jsonAllPredators();
+                break;
+            case "allGrasses":
+                json = MainController.jsonAllGrasses();
+                break;
+            case "liveAnimals":
+                json = MainController.jsonAllLiveAnimals();
+                break;
+            case "liveHerbivores":
+                json = MainController.jsonAllLiveHerbivores();
+                break;
+            case "livePredators":
+                json = MainController.jsonAllLivePredators();
+                break;
         }
 
         dataOutputStream.writeUTF(json);
         dataOutputStream.flush();
 
         dataOutputStream.close();
+    }
+
+    public Socket getClientSocket() {
+        return clientSocket;
     }
 }

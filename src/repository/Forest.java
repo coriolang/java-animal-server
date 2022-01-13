@@ -180,7 +180,13 @@ public class Forest implements Serializable {
         }
     }
 
+    public static void emptyInit() {
+        forest = new Forest();
+    }
+
     public static void defaultInit() {
+        emptyInit();
+
         getInstance();
 
         forest.create(new Grass("Свежая трава", 250.0F));
@@ -195,9 +201,5 @@ public class Forest implements Serializable {
 
         forest.create(new Predator("Волк", 60.0F));
         forest.create(new Predator("Медведь", 200.0F));
-    }
-
-    public static void emptyInit() {
-        forest = new Forest();
     }
 }

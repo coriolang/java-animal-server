@@ -1,6 +1,7 @@
 package controller.listeners;
 
 import controller.MainController;
+import view.MessageBox;
 import view.ServerFrame;
 
 import java.awt.event.WindowAdapter;
@@ -20,9 +21,13 @@ public class WindowListener extends WindowAdapter {
             String publicIpAddress = MainController.getPublicIpAddress();
 
             frame.getIpAddressTextLabel().setText(publicIpAddress);
-            frame.getPortTextLabel().setText(String.valueOf(MainController.SERVER_PORT));
+            frame.getPortTextField().setText(MainController.getDefaultPort());
+
+            frame.getStopServerButton().setEnabled(false);
+
+            frame.getInitializationTypeChoice().select(MainController.getIniType());
         } catch (IOException ex) {
-            frame.getLogsTextArea().setText(ex.getMessage()); // Заменить на месседж бокс
+            MessageBox.showError(ex.getMessage());
         }
     }
 
@@ -31,7 +36,7 @@ public class WindowListener extends WindowAdapter {
             MainController.stopServer();
             MainController.closeApp();
         } catch (IOException ex) {
-            frame.getLogsTextArea().setText(ex.getMessage()); // Заменить на месседж бокс
+            MessageBox.showError(ex.getMessage());
         }
     }
 }
