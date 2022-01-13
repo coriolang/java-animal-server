@@ -17,7 +17,6 @@ public class ClientDialog implements Runnable {
     public void run() {
         try (DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());) {
             String clientCommand = dataInputStream.readUTF();
-            System.out.println("Read from client: " + clientCommand);
 
             String[] splittedCommand = clientCommand.split("&");
 
@@ -38,7 +37,7 @@ public class ClientDialog implements Runnable {
                     test();
                     break;
             }
-            
+
             clientSocket.close();
         } catch (IOException e) {
             MessageBox.showError(e.getMessage());

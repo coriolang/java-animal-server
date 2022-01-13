@@ -8,7 +8,9 @@ import model.Herbivore;
 import model.Predator;
 import repository.Forest;
 import view.MessageBox;
+import view.ServerFrame;
 
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -73,8 +75,8 @@ public class MainController {
         System.exit(0);
     }
 
-    public static void startServer(int port) {
-        server = new Server(port);
+    public static void startServer(int port, TextArea logsTextArea) {
+        server = new Server(port, logsTextArea);
         Thread serverThread = new Thread(server);
 
         serverThread.start();

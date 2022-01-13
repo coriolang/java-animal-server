@@ -33,7 +33,7 @@ public class StartServerButtonListener implements ActionListener {
             MessageBox.showError(MainController.stringResources.getString("INCORRECT_PORT"));
             return;
         }
-        MainController.startServer(port);
+        MainController.startServer(port, frame.getLogsTextArea());
 
         String logMessage = LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"))
                 + " "
