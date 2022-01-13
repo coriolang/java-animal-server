@@ -25,6 +25,8 @@ public class Server implements Runnable {
             serverSocket = new ServerSocket(port);
 
             while (!serverSocket.isClosed()) {
+                clients.removeIf(cli -> cli.getClientSocket().isClosed());
+
                 Socket client = serverSocket.accept();
 
                 ClientDialog clientDialog = new ClientDialog(client);

@@ -38,6 +38,8 @@ public class ClientDialog implements Runnable {
                     test();
                     break;
             }
+            
+            clientSocket.close();
         } catch (IOException e) {
             MessageBox.showError(e.getMessage());
         }

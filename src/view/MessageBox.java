@@ -4,11 +4,9 @@ import controller.MainController;
 
 import javax.swing.*;
 
-public class MessageBox
-{
+public class MessageBox {
 
-    public static void showInfo(String infoMessage)
-    {
+    public static void showInfo(String infoMessage) {
         JOptionPane.showMessageDialog(
                 null,
                 infoMessage,
@@ -17,8 +15,7 @@ public class MessageBox
         );
     }
 
-    public static void showError(String infoMessage)
-    {
+    public static void showError(String infoMessage) {
         JOptionPane.showMessageDialog(
                 null,
                 infoMessage,
