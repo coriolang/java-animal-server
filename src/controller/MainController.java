@@ -8,9 +8,7 @@ import model.Herbivore;
 import model.Predator;
 import repository.Forest;
 import view.MessageBox;
-import view.ServerFrame;
 
-import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -29,6 +27,18 @@ public class MainController {
     private static final int EMPTY_INIT_MODE = 0;
     private static final int DEFAULT_INIT_MODE = 1;
     private static final int FILE_INIT_MODE = 2;
+
+    private static final String ALL_ANIMALS = "allAnimals";
+    private static final String ALL_HERBIVORES = "allHerbivores";
+    private static final String ALL_PREDATORS = "allPredators";
+    private static final String ALL_GRASSES = "allGrasses";
+    private static final String LIVE_ANIMALS = "liveAnimals";
+    private static final String LIVE_HERBIVORES = "liveHerbivores";
+    private static final String LIVE_PREDATORS = "livePredators";
+    private static final String CREATE = "create";
+    private static final String FEED = "feed";
+    private static final String KILL = "kill";
+    private static final String TEST = "test";
 
     private static Forest forest;
 
@@ -75,8 +85,8 @@ public class MainController {
         System.exit(0);
     }
 
-    public static void startServer(int port, TextArea logsTextArea) {
-        server = new Server(port, logsTextArea);
+    public static void startServer(int port) {
+        server = new Server(port);
         Thread serverThread = new Thread(server);
 
         serverThread.start();
@@ -178,8 +188,9 @@ public class MainController {
 
     public static String getPublicIpAddress() throws IOException {
         URL ipAddress = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                ipAddress.openStream()));
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(ipAddress.openStream())
+        );
         String publicIpAddress = in.readLine();
 
         return publicIpAddress;
@@ -187,6 +198,58 @@ public class MainController {
 
     public static String getDefaultPort() {
         return properties.getProperty("DEFAULT_PORT");
+    }
+
+    public static String response(String clientCommand) {
+        String[] splittedCommand = clientCommand.split("&");
+
+        String response = null;
+        switch (splittedCommand[0]) {
+            case ALL_ANIMALS:
+                response = jsonAllAnimals();
+                break;
+            case ALL_HERBIVORES:
+                response = jsonAllHerbivores();
+                break;
+            case ALL_PREDATORS:
+                response = jsonAllPredators();
+                break;
+            case ALL_GRASSES:
+                response = jsonAllGrasses();
+                break;
+            case LIVE_ANIMALS:
+                response = jsonAllLiveAnimals();
+                break;
+            case LIVE_HERBIVORES:
+                response = jsonAllLiveHerbivores();
+                break;
+            case LIVE_PREDATORS:
+                response = jsonAllLivePredators();
+                break;
+            case CREATE:
+                int type = Integer.parseInt(splittedCommand[1]);
+                String name = splittedCommand[2];
+                float weight = Float.parseFloat(splittedCommand[3]);
+
+                response = create(type, name, weight, splittedCommand[4]);
+                break;
+            case FEED:
+                int animalId = Integer.parseInt(splittedCommand[1]);
+                int foodId = Integer.parseInt(splittedCommand[2]);
+
+                response = feed(animalId, foodId, splittedCommand[3]);
+                break;
+            case KILL:
+                int victimId = Integer.parseInt(splittedCommand[1]);
+
+                response = kill(victimId, splittedCommand[2]);
+                break;
+            case TEST:
+                response = test();
+                break;
+        }
+
+        return response;
     }
 
     public static String create(int type, String name, float weight, String locale) {
@@ -362,5 +425,9 @@ public class MainController {
         String json = gson.toJson(stringHashMap);
 
         return json;
+    }
+
+    public static String test() {
+        return "OK";
     }
 }
