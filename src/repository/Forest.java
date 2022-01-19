@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class Forest implements Serializable {
 
-    private static Forest forest = null;
+    private static volatile Forest forest = null;
 
     private HashMap<Integer, Grass> grasses = new HashMap<>();
     private HashMap<Integer, Herbivore> herbivores = new HashMap<>();
@@ -22,11 +22,17 @@ public class Forest implements Serializable {
     private Forest() {}
 
     public static Forest getInstance() {
-        if (forest == null) {
-            forest = new Forest();
+        Forest result = forest;
+        if (result != null) {
+            return result;
         }
 
-        return forest;
+        synchronized (Forest.class) {
+            if (forest == null) {
+                forest = new Forest();
+            }
+            return forest;
+        }
     }
 
     public synchronized void create(Grass grass) {
